@@ -24,34 +24,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     ""name"": ""PlayerInputActions"",
     ""maps"": [
         {
-            ""name"": ""move"",
-            ""id"": ""c3106ff5-d534-41e7-8a3f-23316d951a66"",
-            ""actions"": [
-                {
-                    ""name"": ""input"",
-                    ""type"": ""Value"",
-                    ""id"": ""beba9556-cc9d-458c-b03a-c62969a9312f"",
-                    ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                }
-            ],
-            ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""c44e4043-9852-4f1f-a93c-54979327063e"",
-                    ""path"": ""<Gamepad>/leftStick"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""input"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                }
-            ]
-        },
-        {
             ""name"": ""Jugador"",
             ""id"": ""1b15448d-7f3e-4f97-9f08-35abf190bba7"",
             ""actions"": [
@@ -102,9 +74,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     ],
     ""controlSchemes"": []
 }");
-        // move
-        m_move = asset.FindActionMap("move", throwIfNotFound: true);
-        m_move_input = m_move.FindAction("input", throwIfNotFound: true);
         // Jugador
         m_Jugador = asset.FindActionMap("Jugador", throwIfNotFound: true);
         m_Jugador_Move = m_Jugador.FindAction("Move", throwIfNotFound: true);
@@ -167,52 +136,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
-    // move
-    private readonly InputActionMap m_move;
-    private List<IMoveActions> m_MoveActionsCallbackInterfaces = new List<IMoveActions>();
-    private readonly InputAction m_move_input;
-    public struct MoveActions
-    {
-        private @PlayerInputActions m_Wrapper;
-        public MoveActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @input => m_Wrapper.m_move_input;
-        public InputActionMap Get() { return m_Wrapper.m_move; }
-        public void Enable() { Get().Enable(); }
-        public void Disable() { Get().Disable(); }
-        public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(MoveActions set) { return set.Get(); }
-        public void AddCallbacks(IMoveActions instance)
-        {
-            if (instance == null || m_Wrapper.m_MoveActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_MoveActionsCallbackInterfaces.Add(instance);
-            @input.started += instance.OnInput;
-            @input.performed += instance.OnInput;
-            @input.canceled += instance.OnInput;
-        }
-
-        private void UnregisterCallbacks(IMoveActions instance)
-        {
-            @input.started -= instance.OnInput;
-            @input.performed -= instance.OnInput;
-            @input.canceled -= instance.OnInput;
-        }
-
-        public void RemoveCallbacks(IMoveActions instance)
-        {
-            if (m_Wrapper.m_MoveActionsCallbackInterfaces.Remove(instance))
-                UnregisterCallbacks(instance);
-        }
-
-        public void SetCallbacks(IMoveActions instance)
-        {
-            foreach (var item in m_Wrapper.m_MoveActionsCallbackInterfaces)
-                UnregisterCallbacks(item);
-            m_Wrapper.m_MoveActionsCallbackInterfaces.Clear();
-            AddCallbacks(instance);
-        }
-    }
-    public MoveActions @move => new MoveActions(this);
-
     // Jugador
     private readonly InputActionMap m_Jugador;
     private List<IJugadorActions> m_JugadorActionsCallbackInterfaces = new List<IJugadorActions>();
@@ -266,10 +189,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         }
     }
     public JugadorActions @Jugador => new JugadorActions(this);
-    public interface IMoveActions
-    {
-        void OnInput(InputAction.CallbackContext context);
-    }
     public interface IJugadorActions
     {
         void OnMove(InputAction.CallbackContext context);

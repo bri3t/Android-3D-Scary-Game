@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(CharacterController))]
 public class PlayerControl : MonoBehaviour
 {
     public float moveSpeed = 5.0f;  // Velocidad de movimiento del personaje
@@ -11,52 +10,44 @@ public class PlayerControl : MonoBehaviour
 
     private Vector2 moveInput;      // Vector para almacenar la entrada del joystick
     private Vector2 lookInput;      // Vector para almacenar la entrada de la rotación de la cámara
-    private CharacterController characterController;
     private Camera mainCamera;
 
     private PlayerInputActions inputActions;
 
     private void Awake()
     {
-        characterController = GetComponent<CharacterController>();
         mainCamera = Camera.main;
-
         inputActions = new PlayerInputActions();
     }
 
     private void OnEnable()
     {
         inputActions.Jugador.Enable();
-        inputActions.Jugador.Move.performed += OnMove;
         inputActions.Jugador.Look.performed += OnLook;
         inputActions.Jugador.Look.canceled += OnLookCanceled;
     }
 
     private void OnDisable()
     {
-        inputActions.Jugador.Move.performed -= OnMove;
         inputActions.Jugador.Look.performed -= OnLook;
         inputActions.Jugador.Look.canceled -= OnLookCanceled;
         inputActions.Jugador.Disable();
     }
 
-    // Se llama cuando se procesa la entrada de movimiento
     public void OnMove(InputAction.CallbackContext context)
     {
-        moveInput = context.ReadValue<Vector2>();  // Lee el vector de movimiento del joystick
+        moveInput = context.ReadValue<Vector2>();
     }
 
-    // Se llama cuando se procesa la entrada de toque en la pantalla
     public void OnLook(InputAction.CallbackContext context)
     {
         Vector2 touchPosition = Pointer.current.position.ReadValue();
-        if (touchPosition.x > Screen.width / 2)
+        if (touchPosition.x > Screen.width * 0.4f)  // Solo activa OnLook si el toque está en el 70% derecho de la pantalla
         {
-            lookInput = context.ReadValue<Vector2>();  // Lee el vector de rotación de la cámara
+            lookInput = context.ReadValue<Vector2>();
         }
     }
 
-    // Se llama cuando se deja de procesar la entrada de toque en la pantalla
     public void OnLookCanceled(InputAction.CallbackContext context)
     {
         lookInput = Vector2.zero;
@@ -67,8 +58,9 @@ public class PlayerControl : MonoBehaviour
         // Movimiento del personaje
         Vector3 movement = new Vector3(moveInput.x, 0, moveInput.y);
         movement = mainCamera.transform.TransformDirection(movement);
-        movement.y = 0f;
-        characterController.Move(moveSpeed * Time.deltaTime * movement);
+        movement.y = 0f; // Asegúrate de que el movimiento en el eje Y sea cero
+        movement.Normalize();
+        transform.Translate(moveSpeed * movement * Time.deltaTime, Space.World);
 
         // Rotación de la cámara
         if (lookInput != Vector2.zero)
@@ -82,11 +74,12 @@ public class PlayerControl : MonoBehaviour
         float rotationX = -lookInput.y * rotationSpeed * Time.deltaTime;  // Rotación vertical (invertida)
         float rotationY = lookInput.x * rotationSpeed * Time.deltaTime;   // Rotación horizontal
 
-        // Rotar la cámara en ambas direcciones
-        mainCamera.transform.Rotate(rotationX, rotationY, 0);
-
         // Asegura que la cámara no se incline
-        Vector3 currentEulerAngles = mainCamera.transform.eulerAngles;
-        mainCamera.transform.eulerAngles = new Vector3(currentEulerAngles.x, currentEulerAngles.y, 0);
+        mainCamera.transform.Rotate(new Vector3(rotationX, rotationY, 0), Space.Self);
+
+        // Clamping the rotation to avoid flipping the camera
+        Vector3 currentEulerAngles = mainCamera.transform.localEulerAngles;
+        currentEulerAngles.z = 0; // No inclinación
+        mainCamera.transform.localEulerAngles = currentEulerAngles;
     }
 }
