@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class UseChest : MonoBehaviour
 {
@@ -8,19 +9,31 @@ public class UseChest : MonoBehaviour
     public GameObject handUI;
     public GameObject objToActivate;
 
-
     private bool inReach;
 
+    private PlayerInputActions inputActions;
+
+    private void Awake()
+    {
+        inputActions = new PlayerInputActions();
+        inputActions.Jugador.Interact.performed += OnInteract;
+    }
+
+    private void OnEnable()
+    {
+        inputActions.Jugador.Enable();
+    }
+
+    private void OnDisable()
+    {
+        inputActions.Jugador.Disable();
+    }
 
     void Start()
     {
-
         OB = this.gameObject;
-
         handUI.SetActive(false);
-
         objToActivate.SetActive(false);
-
     }
 
     void OnTriggerEnter(Collider other)
@@ -30,7 +43,6 @@ public class UseChest : MonoBehaviour
             inReach = true;
             handUI.SetActive(true);
         }
-
     }
 
     void OnTriggerExit(Collider other)
@@ -42,11 +54,9 @@ public class UseChest : MonoBehaviour
         }
     }
 
-    void Update()
+    private void OnInteract(InputAction.CallbackContext context)
     {
-
-
-        if (inReach && Input.GetButtonDown("Interact"))
+        if (inReach)
         {
             handUI.SetActive(false);
             objToActivate.SetActive(true);
@@ -54,5 +64,4 @@ public class UseChest : MonoBehaviour
             OB.GetComponent<BoxCollider>().enabled = false;
         }
     }
-
 }
