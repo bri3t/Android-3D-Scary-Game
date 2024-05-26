@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class Door : MonoBehaviour
@@ -13,9 +14,28 @@ public class Door : MonoBehaviour
 
     public string nextSceneName; // Name of the next scene to load
 
+    private PlayerInputActions inputActions;
+
 
     private bool inReach;
 
+
+    private void Awake()
+    {
+        inputActions = new PlayerInputActions();
+        inputActions.Jugador.Interact.performed += OnInteract;
+    }
+
+
+    private void OnEnable()
+    {
+        inputActions.Jugador.Enable();
+    }
+
+    private void OnDisable()
+    {
+        inputActions.Jugador.Disable();
+    }
 
     void Start()
     {
@@ -49,17 +69,17 @@ public class Door : MonoBehaviour
         }
     }
 
-    void Update()
+   
+
+    private void OnInteract(InputAction.CallbackContext context)
     {
-
-
-        if (inReach && Input.GetButtonDown("Interact") && !invKey.activeInHierarchy)
+        if (inReach && !invKey.activeInHierarchy)
         {
             handUI.SetActive(true);
             UIText.SetActive(true);
         }
 
-        if (inReach && Input.GetButtonDown("Interact") && invKey.activeInHierarchy)
+        if (inReach && invKey.activeInHierarchy)
         {
             handUI.SetActive(false);
             UIText.SetActive(false);
@@ -70,6 +90,7 @@ public class Door : MonoBehaviour
 
     IEnumerator ending()
     {
+        Debug.Log("Ending");
         yield return new WaitForSeconds(.6f);
         SceneManager.LoadScene(nextSceneName);
     }
