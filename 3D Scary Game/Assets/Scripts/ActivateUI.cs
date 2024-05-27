@@ -55,7 +55,12 @@ public class ActivateUI : MonoBehaviour
 
     private void OnInteract(InputAction.CallbackContext context)
     {
+        if (inReach)
+        {
             objToActivate.SetActive(true);
         }
     }
+
+}
+
 
