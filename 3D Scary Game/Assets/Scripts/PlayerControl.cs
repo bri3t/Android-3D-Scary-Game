@@ -173,13 +173,5 @@ public class PlayerControl : MonoBehaviour
         {
             currentFootstepSounds = woodFootstepSounds;
         }
-        else if (other.CompareTag("Tile"))
-        {
-            currentFootstepSounds = tileFootstepSounds;
-        }
-        else if (other.CompareTag("Carpet"))
-        {
-            currentFootstepSounds = carpetFootstepSounds;
-        }
     }
 }
