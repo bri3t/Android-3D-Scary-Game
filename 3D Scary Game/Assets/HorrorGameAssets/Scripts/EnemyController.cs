@@ -31,6 +31,13 @@ public class EnemyController : MonoBehaviour
         animator = GetComponent<Animator>(); // Obtiene el componente Animator.
         player = GameObject.FindGameObjectWithTag("Player").transform; // Encuentra al jugador por la etiqueta "Player".
         audioSource = GetComponent<AudioSource>(); // Obtiene el componente AudioSource.
+
+        // Configura el AudioSource para 3D sound
+        audioSource.spatialBlend = 1.0f; // 3D sound
+        audioSource.minDistance = 4.0f; // Distancia mínima para escuchar al volumen máximo
+        audioSource.maxDistance = 20.0f; // Distancia máxima para escuchar el sonido
+        audioSource.rolloffMode = AudioRolloffMode.Logarithmic; // Modo de disminución logarítmica
+
         SetDestinationToWaypoint(); // Establece el destino al primer punto de ruta.
     }
 
