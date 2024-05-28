@@ -9,6 +9,7 @@ TagManager:
   - minimap
   - Enemy
   - Wood
+  - blockdoor
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - 
   - 
   - Wood
-  - 
+  - minimap
   - 
   - 
   - 
